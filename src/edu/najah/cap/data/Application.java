@@ -3,6 +3,9 @@ package edu.najah.cap.data;
 import edu.najah.cap.activity.IUserActivityService;
 import edu.najah.cap.activity.UserActivity;
 import edu.najah.cap.activity.UserActivityService;
+import edu.najah.cap.export.ExportActivity;
+import edu.najah.cap.export.ExportProfile;
+import edu.najah.cap.export.ExportTransaction;
 import edu.najah.cap.iam.IUserService;
 import edu.najah.cap.iam.UserProfile;
 import edu.najah.cap.iam.UserService;
@@ -13,6 +16,7 @@ import edu.najah.cap.payment.Transaction;
 import edu.najah.cap.posts.IPostService;
 import edu.najah.cap.posts.Post;
 import edu.najah.cap.posts.PostService;
+import edu.najah.cap.export.ExportPosts;
 
 import java.time.Instant;
 
@@ -29,15 +33,19 @@ public class Application {
         Instant start = Instant.now();
         System.out.println("Application Started: " + start);
         //TODO Your application starts here. Do not Change the existing code
-
-
-
-
-
-
-
-
-
+        String user = "user29";
+        System.out.println("Exporting " + user + " Posts");
+        ExportPosts.exportPosts(user, postService);
+        System.out.println("Finished exporting posts");
+        System.out.println("Exporting " + user + " Activity");
+        ExportActivity.exportActivity(user, userActivityService);
+        System.out.println("Finished exporting activity");
+        System.out.println("Exporting " + user + " Payment");
+        ExportTransaction.exportTransaction(user, paymentService);
+        System.out.println("Finished exporting payment");
+        System.out.println("Exporting " + user + " Profile");
+        ExportProfile.exportProfile(user, userService);
+        System.out.println("Finished exporting profile");
 
         //TODO Your application ends here. Do not Change the existing code
         Instant end = Instant.now();

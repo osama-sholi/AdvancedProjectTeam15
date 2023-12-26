@@ -1,4 +1,4 @@
-package edu.najah.cap.customexceptions;
+package edu.najah.cap.exceptions;
 
 public class BlankUsernameException extends Exception {
     public BlankUsernameException(String message) {

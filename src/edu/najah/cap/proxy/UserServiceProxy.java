@@ -1,8 +1,6 @@
 package edu.najah.cap.proxy;
 
-import edu.najah.cap.customexceptions.BlankUsernameException;
-import edu.najah.cap.customexceptions.UserAlreadyExistsException;
-import edu.najah.cap.customexceptions.UserDeletedException;
+import edu.najah.cap.exceptions.*;
 import edu.najah.cap.delete.DeletedUsersArchive;
 import edu.najah.cap.iam.IUserService;
 import edu.najah.cap.iam.UserProfile;
@@ -35,6 +33,10 @@ public class UserServiceProxy implements IUserService {
                 userService.addUser(user);
             } catch (UserAlreadyExistsException | UserDeletedException | BlankUsernameException e) {
                 LOGGER.warning(e.getMessage());
+            } catch (NotFoundException | NullPointerException e) {
+                LOGGER.warning(e.getMessage());
+            } catch (Exception e) {
+                LOGGER.warning(e.getMessage());
             }
         }
 
@@ -53,17 +55,35 @@ public class UserServiceProxy implements IUserService {
                 userService.updateUser(user);
             } catch (UserAlreadyExistsException | UserDeletedException | BlankUsernameException e) {
                 LOGGER.warning(e.getMessage());
+            } catch (NotFoundException | NullPointerException e) {
+                LOGGER.warning(e.getMessage());
+            } catch (Exception e) {
+                LOGGER.warning(e.getMessage());
             }
         }
 
         @Override
         public void deleteUser(String userName) {
-            DeletedUsersArchive.addDeletedUser(userName);
-            userService.deleteUser(userName);
+            try {
+                DeletedUsersArchive.addDeletedUser(userName);
+                userService.deleteUser(userName);
+            } catch (NotFoundException | BadRequestException | SystemBusyException e) {
+                LOGGER.warning(e.getMessage());
+            } catch (Exception e) {
+                LOGGER.warning(e.getMessage());
+            }
+
         }
 
         @Override
         public UserProfile getUser(String userName) {
-            return userService.getUser(userName);
+            try {
+                return userService.getUser(userName);
+            } catch (NotFoundException | BadRequestException | SystemBusyException e) {
+                LOGGER.warning(e.getMessage());
+            } catch (Exception e) {
+                LOGGER.warning(e.getMessage());
+            }
+            return null;
         }
 }

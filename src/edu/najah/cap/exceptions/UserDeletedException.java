@@ -1,4 +1,4 @@
-package edu.najah.cap.customexceptions;
+package edu.najah.cap.exceptions;
 
 public class UserDeletedException extends Exception{
     public UserDeletedException(String message) {

@@ -3,6 +3,9 @@ package edu.najah.cap.data;
 import edu.najah.cap.activity.IUserActivityService;
 import edu.najah.cap.activity.UserActivity;
 import edu.najah.cap.activity.UserActivityService;
+import edu.najah.cap.delete.AbstractDelete;
+import edu.najah.cap.delete.DeleteFactory;
+import edu.najah.cap.delete.DeleteTypes;
 import edu.najah.cap.iam.IUserService;
 import edu.najah.cap.iam.UserProfile;
 import edu.najah.cap.iam.UserService;
@@ -13,6 +16,7 @@ import edu.najah.cap.payment.Transaction;
 import edu.najah.cap.posts.IPostService;
 import edu.najah.cap.posts.Post;
 import edu.najah.cap.posts.PostService;
+import edu.najah.cap.proxy.UserServiceProxy;
 
 import java.time.Instant;
 
@@ -29,15 +33,25 @@ public class Application {
         Instant start = Instant.now();
         System.out.println("Application Started: " + start);
         //TODO Your application starts here. Do not Change the existing code
+        IUserService userService = new UserServiceProxy();
+        UserProfile user1 = userService.getUser("user1");
+        UserProfile user2 = new UserProfile();
+        user2.setUserName("user1");
+        userService.addUser(user2); // User2 won't be added as user1's username already exists
 
+        // here export the user data to a file
 
+        AbstractDelete softDelete = DeleteFactory.getDelete(DeleteTypes.SOFT_DELETE);
+        softDelete.delete("user1");
 
+        // here export the user data to a file
 
+        AbstractDelete hardDelete = DeleteFactory.getDelete(DeleteTypes.HARD_DELETE);
+        hardDelete.delete("user1");
 
+        // here export the user data to a file
 
-
-
-
+        userService.addUser(user2); // User2 won't be added as user1's username is in the deleted users archive
 
         //TODO Your application ends here. Do not Change the existing code
         Instant end = Instant.now();

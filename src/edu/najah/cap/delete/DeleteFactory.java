@@ -1,7 +1,7 @@
 package edu.najah.cap.delete;
 
 public class DeleteFactory {
-    public static IDelete getDelete(DeleteTypes type){
+    public static AbstractDelete getDelete(DeleteTypes type){
         if (DeleteTypes.HARD_DELETE.equals(type)){
             return new HardDelete();
         }

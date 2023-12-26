@@ -6,6 +6,9 @@ import edu.najah.cap.activity.UserActivityService;
 import edu.najah.cap.delete.AbstractDelete;
 import edu.najah.cap.delete.DeleteFactory;
 import edu.najah.cap.delete.DeleteTypes;
+import edu.najah.cap.exceptions.BadRequestException;
+import edu.najah.cap.exceptions.NotFoundException;
+import edu.najah.cap.exceptions.SystemBusyException;
 import edu.najah.cap.iam.IUserService;
 import edu.najah.cap.iam.UserProfile;
 import edu.najah.cap.iam.UserService;
@@ -19,6 +22,7 @@ import edu.najah.cap.posts.PostService;
 import edu.najah.cap.proxy.UserServiceProxy;
 
 import java.time.Instant;
+import java.util.Scanner;
 
 public class Application {
 
@@ -27,32 +31,38 @@ public class Application {
     private static final IUserService userService = new UserService();
     private static final IPostService postService = new PostService();
 
+    private static String loginUserName;
 
     public static void main(String[] args) {
         generateRandomData();
         Instant start = Instant.now();
         System.out.println("Application Started: " + start);
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter your username: ");
+        System.out.println("Note: You can use any of the following usernames: user0, user1, user2, user3, .... user99");
+        String userName = scanner.nextLine();
+        setLoginUserName(userName);
         //TODO Your application starts here. Do not Change the existing code
-        IUserService userService = new UserServiceProxy();
-        UserProfile user1 = userService.getUser("user1");
-        UserProfile user2 = new UserProfile();
-        user2.setUserName("user1");
-        userService.addUser(user2); // User2 won't be added as user1's username already exists
+        try {
+            IUserService userService = new UserServiceProxy();
 
-        // here export the user data to a file
+            userService.getUser(userName);
+            // here export the user data to a file
 
-        AbstractDelete softDelete = DeleteFactory.getDelete(DeleteTypes.SOFT_DELETE);
-        softDelete.delete("user1");
+            AbstractDelete softDelete = DeleteFactory.getDelete(DeleteTypes.SOFT_DELETE);
+            softDelete.delete(userName);
 
-        // here export the user data to a file
+            // here export the user data to a file
 
-        AbstractDelete hardDelete = DeleteFactory.getDelete(DeleteTypes.HARD_DELETE);
-        hardDelete.delete("user1");
+            AbstractDelete hardDelete = DeleteFactory.getDelete(DeleteTypes.HARD_DELETE);
+            hardDelete.delete(userName);
 
-        // here export the user data to a file
+            // here export the user data to a file
 
-        userService.addUser(user2); // User2 won't be added as user1's username is in the deleted users archive
-
+        } catch (BadRequestException | NotFoundException | SystemBusyException e) {
+            e.printStackTrace();
+        }
         //TODO Your application ends here. Do not Change the existing code
         Instant end = Instant.now();
         System.out.println("Application Ended: " + end);
@@ -77,7 +87,13 @@ public class Application {
 
     private static void generatePayment(int i) {
         for (int j = 0; j < 100; j++) {
-            paymentService.pay(new Transaction("user" + i, i * j, "description" + i + "." + j));
+            try {
+                if (userService.getUser("user" + i).getUserType() == UserType.PREMIUM_USER) {
+                    paymentService.pay(new Transaction("user" + i, i * j, "description" + i + "." + j));
+                }
+            } catch (Exception e) {
+                System.err.println("Error while generating post for user" + i);
+            }
         }
     }
 
@@ -115,5 +131,13 @@ public class Application {
         } else {
             return UserType.PREMIUM_USER;
         }
+    }
+
+    public static String getLoginUserName() {
+        return loginUserName;
+    }
+
+    private static void setLoginUserName(String loginUserName) {
+        Application.loginUserName = loginUserName;
     }
 }

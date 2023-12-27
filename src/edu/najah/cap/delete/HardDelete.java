@@ -11,11 +11,11 @@ import static edu.najah.cap.delete.DeleteService.deleteUser;
 public class HardDelete implements IDelete {
     @Override
     public void delete(String username) throws BadRequestException {
-        MyLogging.log(Level.INFO, "Hard Delete Started for " + username);
+        MyLogging.log(Level.INFO, "Hard Delete Started for " + username, "HardDelete", "delete");
         deleteData("Posts", username);
         deleteData("Transactions", username);
         deleteData("User Activities", username);
         deleteUser(username);
-        MyLogging.log(Level.INFO, "Hard Delete Completed for " + username);
+        MyLogging.log(Level.INFO, "Hard Delete Completed for " + username, "HardDelete", "delete");
     }
 }

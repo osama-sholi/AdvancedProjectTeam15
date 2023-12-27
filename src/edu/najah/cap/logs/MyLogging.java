@@ -27,7 +27,7 @@ public class MyLogging {
         return logger;
     }
 
-    public static void log(Level level, String msg) {
-        getLogger().log(level, msg);
+    public static void log(Level level, String msg, String className, String methodName) {
+        getLogger().logp(level, className, methodName, msg);
     }
 }

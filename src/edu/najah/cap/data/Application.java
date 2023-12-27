@@ -53,17 +53,12 @@ public class Application {
                     proxyUserService.getUser(userName);
                     break;
                 } catch (NotFoundException e) {
-                    MyLogging.log(Level.SEVERE, e.getMessage());
+                    MyLogging.log(Level.SEVERE, e.getMessage(), "Application", "main");
                     return;
                 } catch (SystemBusyException e) {
-                    MyLogging.log(Level.WARNING, "System Busy, Trying Again...");
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException interruptedException) {
-                        interruptedException.printStackTrace();
-                    }
+                    MyLogging.log(Level.WARNING, "System Busy, Trying Again...", "Application", "main");
                 } catch (BadRequestException e) {
-                    MyLogging.log(Level.SEVERE, e.getMessage());
+                    MyLogging.log(Level.SEVERE, e.getMessage(), "Application", "main");
                     return;
                 }
             }
@@ -84,11 +79,12 @@ public class Application {
             proxyUserService.addUser(user); // This should throw an exception
 
         } catch (Exception e) {
-            MyLogging.log(Level.SEVERE, e.getMessage());
+            MyLogging.log(Level.SEVERE, e.getMessage(), "Application", "main");
         }
         //TODO Your application ends here. Do not Change the existing code
         Instant end = Instant.now();
         System.out.println("Application Ended: " + end);
+        System.out.println("Total Time: " + (end.toEpochMilli() - start.toEpochMilli()) + " Milliseconds");
     }
 
 

@@ -18,67 +18,57 @@ import java.util.logging.Level;
 
 public class DeleteService {
     public static synchronized void deleteData(String dataType, String username) throws BadRequestException {
-        while (true) {
-            try {
-                DeleteIterator iterator = getIterator(dataType, username);
-                if (!iterator.hasNext()) {
-                    throw new NotFoundException("No " + dataType + " Found for username: " + username);
-                }
-                while (iterator.hasNext()) {
-                    iterator.deleteCurrent();
-                }
-                MyLogging.log(Level.INFO, "All " + dataType + " Deleted for username: " + username);
-                return;
-            } catch (NotFoundException e) {
-                MyLogging.log(Level.INFO, "No " + dataType + " Found for username: " + username);
-                return;
-            } catch (SystemBusyException e) {
-                MyLogging.log(Level.WARNING, "System Busy, Trying Again...");
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException interruptedException) {
-                    interruptedException.printStackTrace();
-                }
-            } catch (IllegalArgumentException e) {
-                MyLogging.log(Level.SEVERE, e.getMessage());
-                return;
+        try {
+            DeleteIterator iterator = getIterator(dataType, username);
+            if (!iterator.hasNext()) {
+                throw new NotFoundException("No " + dataType + " Found for username: " + username);
             }
+            while (iterator.hasNext()) {
+                iterator.deleteCurrent();
+            }
+            MyLogging.log(Level.INFO, "All " + dataType + " Deleted for username: " + username, "DeleteService", "deleteData");
+        } catch (NotFoundException e) {
+            MyLogging.log(Level.INFO, "No " + dataType + " Found for username: " + username, "DeleteService", "deleteData");
+        } catch (IllegalArgumentException e) {
+            MyLogging.log(Level.SEVERE, e.getMessage(), "DeleteService", "deleteData");
         }
     }
+
 
     public static synchronized void deleteUser(String username) throws BadRequestException {
         while (true) {
             try {
                 IUserService userService = UserServiceFactory.getUserService("UserServiceProxy");
                 userService.deleteUser(username);
-                MyLogging.log(Level.INFO, "User Deleted: " + username);
+                MyLogging.log(Level.INFO, "User Deleted: " + username, "DeleteService", "deleteUser");
                 return;
             } catch (NotFoundException e) {
-                MyLogging.log(Level.INFO, "User Not Found: " + username);
+                MyLogging.log(Level.INFO, "User Not Found: " + username, "DeleteService", "deleteUser");
                 return;
             } catch (SystemBusyException e) {
-                MyLogging.log(Level.WARNING, "System Busy, Trying Again...");
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException interruptedException) {
-                    interruptedException.printStackTrace();
-                }
+                MyLogging.log(Level.WARNING, "System Busy, Trying Again...", "DeleteService", "deleteUser");
             }
         }
     }
 
-    private static DeleteIterator getIterator(String dataType, String username) throws NotFoundException, SystemBusyException, BadRequestException, IllegalArgumentException {
-        if ("Posts".equals(dataType)) {
-            IPostService postService = PostServiceFactory.getPostService("PostService");
-            return new DeleteIterator<>(postService.getPosts(username));
-        } else if ("Transactions".equals(dataType)) {
-            IPayment paymentService = PaymentServiceFactory.getPaymentService("PaymentService");
-            return new DeleteIterator<>(paymentService.getTransactions(username));
-        } else if ("User Activities".equals(dataType)) {
-            IUserActivityService userActivityService = ActivityServiceFactory.getActivityService("ActivityService");
-            return new DeleteIterator<>(userActivityService.getUserActivity(username));
-        } else {
-            throw new InvalidParameterException("Invalid Service Type");
+    private static DeleteIterator getIterator(String dataType, String username) throws NotFoundException, BadRequestException, IllegalArgumentException {
+        while (true) {
+            try {
+                if ("Posts".equals(dataType)) {
+                    IPostService postService = PostServiceFactory.getPostService("PostService");
+                    return new DeleteIterator<>(postService.getPosts(username));
+                } else if ("Transactions".equals(dataType)) {
+                    IPayment paymentService = PaymentServiceFactory.getPaymentService("PaymentService");
+                    return new DeleteIterator<>(paymentService.getTransactions(username));
+                } else if ("User Activities".equals(dataType)) {
+                    IUserActivityService userActivityService = ActivityServiceFactory.getActivityService("ActivityService");
+                    return new DeleteIterator<>(userActivityService.getUserActivity(username));
+                } else {
+                    throw new InvalidParameterException("Invalid Service Type");
+                }
+            } catch (SystemBusyException e) {
+                MyLogging.log(Level.WARNING, "System Busy, Trying Again...", "DeleteService", "getIterator");
+            }
         }
     }
 }

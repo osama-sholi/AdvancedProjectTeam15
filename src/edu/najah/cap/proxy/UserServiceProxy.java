@@ -24,7 +24,7 @@ public class UserServiceProxy implements IUserService {
         try {
             validateUsername(user.getUserName());
         } catch (UserDeletedException | BlankUsernameException | UserAlreadyExistsException | BadRequestException e) {
-            MyLogging.log(Level.SEVERE, e.getMessage());
+            MyLogging.log(Level.SEVERE, e.getMessage(), "UserServiceProxy", "addUser");
         } catch (NotFoundException e) {
             userService.addUser(user);
         }
@@ -47,7 +47,7 @@ public class UserServiceProxy implements IUserService {
     }
 
     private void validateUsername(String username) throws BlankUsernameException, UserDeletedException, UserAlreadyExistsException, NotFoundException, BadRequestException {
-        try {
+
             if (username.trim().isBlank()) {
                 throw new BlankUsernameException("User name cannot be empty");
             }
@@ -55,16 +55,12 @@ public class UserServiceProxy implements IUserService {
                 throw new UserDeletedException("Username unavailable as it is deleted");
             }
             while (true) {
-                userService.getUser(username);
-                throw new UserAlreadyExistsException("User already exists");
+                try {
+                    userService.getUser(username);
+                    throw new UserAlreadyExistsException("User already exists");
+                } catch (SystemBusyException e) {
+                    MyLogging.log(Level.WARNING, "System Busy, Trying Again...", "UserServiceProxy", "validateUsername");
+                }
             }
-        } catch (SystemBusyException e) {
-            MyLogging.log(Level.WARNING, "System Busy, Trying Again...");
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException interruptedException) {
-                interruptedException.printStackTrace();
-            }
-        }
     }
 }

@@ -15,7 +15,6 @@ public class MyLogging {
             logger = Logger.getLogger(MyLogging.class.getName());
             fh = new FileHandler("./src/edu/najah/cap/logs/Logs.log");
             logger.addHandler(fh);
-            logger.setLevel(Level.ALL); // Set the default level, e.g., Level.INFO
             SimpleFormatter formatter = new SimpleFormatter();
             fh.setFormatter(formatter);
         } catch (SecurityException | IOException e) {

@@ -5,7 +5,6 @@ import edu.najah.cap.exceptions.BadRequestException;
 import edu.najah.cap.exceptions.NotFoundException;
 import edu.najah.cap.exceptions.SystemBusyException;
 import edu.najah.cap.iam.IUserService;
-import edu.najah.cap.logs.MyLogging;
 import edu.najah.cap.payment.IPayment;
 import edu.najah.cap.posts.IPostService;
 import edu.najah.cap.servicesfactories.ActivityServiceFactory;
@@ -16,7 +15,10 @@ import edu.najah.cap.servicesfactories.UserServiceFactory;
 import java.security.InvalidParameterException;
 import java.util.logging.Level;
 
+import static edu.najah.cap.logs.MyLogging.log;
+
 public class DeleteService {
+
     public static synchronized void deleteData(String dataType, String username) throws BadRequestException {
         try {
             DeleteIterator iterator = getIterator(dataType, username);
@@ -26,11 +28,11 @@ public class DeleteService {
             while (iterator.hasNext()) {
                 iterator.deleteCurrent();
             }
-            MyLogging.log(Level.INFO, "All " + dataType + " Deleted for username: " + username, "DeleteService", "deleteData");
+            log(Level.INFO, "All " + dataType + " Deleted for username: " + username, "DeleteService", "deleteData");
         } catch (NotFoundException e) {
-            MyLogging.log(Level.INFO, "No " + dataType + " Found for username: " + username, "DeleteService", "deleteData");
+            log(Level.INFO, "No " + dataType + " Found for username: " + username, "DeleteService", "deleteData");
         } catch (IllegalArgumentException e) {
-            MyLogging.log(Level.SEVERE, e.getMessage(), "DeleteService", "deleteData");
+            log(Level.SEVERE, e.getMessage(), "DeleteService", "deleteData");
         }
     }
 
@@ -40,13 +42,13 @@ public class DeleteService {
             try {
                 IUserService userService = UserServiceFactory.getUserService("UserServiceProxy");
                 userService.deleteUser(username);
-                MyLogging.log(Level.INFO, "User Deleted: " + username, "DeleteService", "deleteUser");
+                log(Level.INFO, "User Deleted: " + username, "DeleteService", "deleteUser");
                 return;
             } catch (NotFoundException e) {
-                MyLogging.log(Level.INFO, "User Not Found: " + username, "DeleteService", "deleteUser");
+                log(Level.INFO, "User Not Found: " + username, "DeleteService", "deleteUser");
                 return;
             } catch (SystemBusyException e) {
-                MyLogging.log(Level.WARNING, "System Busy, Trying Again...", "DeleteService", "deleteUser");
+                log(Level.WARNING, "System Busy, Trying Again...", "DeleteService", "deleteUser");
             }
         }
     }
@@ -67,7 +69,7 @@ public class DeleteService {
                     throw new InvalidParameterException("Invalid Service Type");
                 }
             } catch (SystemBusyException e) {
-                MyLogging.log(Level.WARNING, "System Busy, Trying Again...", "DeleteService", "getIterator");
+                log(Level.WARNING, "System Busy, Trying Again...", "DeleteService", "getIterator");
             }
         }
     }

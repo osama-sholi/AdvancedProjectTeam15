@@ -14,7 +14,6 @@ import edu.najah.cap.iam.IUserService;
 import edu.najah.cap.iam.UserProfile;
 import edu.najah.cap.iam.UserService;
 import edu.najah.cap.iam.UserType;
-import edu.najah.cap.logs.MyLogging;
 import edu.najah.cap.payment.IPayment;
 import edu.najah.cap.payment.PaymentService;
 import edu.najah.cap.payment.Transaction;
@@ -26,7 +25,8 @@ import edu.najah.cap.servicesfactories.UserServiceFactory;
 import java.time.Instant;
 import java.util.Scanner;
 import java.util.logging.Level;
-import java.util.concurrent.ExecutorService;
+
+import static edu.najah.cap.logs.MyLogging.log;
 
 public class Application {
 
@@ -54,12 +54,12 @@ public class Application {
                     proxyUserService.getUser(userName);
                     break;
                 } catch (NotFoundException e) {
-                    MyLogging.log(Level.SEVERE, e.getMessage(), "Application", "main");
+                    log(Level.SEVERE, e.getMessage(), "Application", "main");
                     return;
                 } catch (SystemBusyException e) {
-                    MyLogging.log(Level.WARNING, "System Busy, Trying Again...", "Application", "main");
+                    log(Level.WARNING, "System Busy, Trying Again...", "Application", "main");
                 } catch (BadRequestException e) {
-                    MyLogging.log(Level.SEVERE, e.getMessage(), "Application", "main");
+                    log(Level.SEVERE, e.getMessage(), "Application", "main");
                     return;
                 }
             }
@@ -80,7 +80,7 @@ public class Application {
             proxyUserService.addUser(user); // This should throw an exception
 
         } catch (Exception e) {
-            MyLogging.log(Level.SEVERE, e.getMessage(), "Application", "main");
+            log(Level.SEVERE, e.getMessage(), "Application", "main");
         }
         //TODO Your application ends here. Do not Change the existing code
         Instant end = Instant.now();

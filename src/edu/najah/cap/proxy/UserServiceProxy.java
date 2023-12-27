@@ -5,9 +5,10 @@ import edu.najah.cap.exceptions.*;
 import edu.najah.cap.iam.IUserService;
 import edu.najah.cap.iam.UserProfile;
 import edu.najah.cap.iam.UserService;
-import edu.najah.cap.logs.MyLogging;
 
 import java.util.logging.Level;
+
+import static edu.najah.cap.logs.MyLogging.log;
 
 
 public class UserServiceProxy implements IUserService {
@@ -24,7 +25,7 @@ public class UserServiceProxy implements IUserService {
         try {
             validateUsername(user.getUserName());
         } catch (UserDeletedException | BlankUsernameException | UserAlreadyExistsException | BadRequestException e) {
-            MyLogging.log(Level.SEVERE, e.getMessage(), "UserServiceProxy", "addUser");
+            log(Level.SEVERE, e.getMessage(), "UserServiceProxy", "addUser");
         } catch (NotFoundException e) {
             userService.addUser(user);
         }
@@ -59,7 +60,7 @@ public class UserServiceProxy implements IUserService {
                     userService.getUser(username);
                     throw new UserAlreadyExistsException("User already exists");
                 } catch (SystemBusyException e) {
-                    MyLogging.log(Level.WARNING, "System Busy, Trying Again...", "UserServiceProxy", "validateUsername");
+                    log(Level.WARNING, "System Busy, Trying Again...", "UserServiceProxy", "validateUsername");
                 }
             }
     }

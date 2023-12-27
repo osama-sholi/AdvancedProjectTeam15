@@ -3,6 +3,7 @@ package edu.najah.cap.data;
 import edu.najah.cap.activity.IUserActivityService;
 import edu.najah.cap.activity.UserActivity;
 import edu.najah.cap.activity.UserActivityService;
+import edu.najah.cap.compress.*;
 import edu.najah.cap.iam.IUserService;
 import edu.najah.cap.iam.UserProfile;
 import edu.najah.cap.iam.UserService;
@@ -14,6 +15,7 @@ import edu.najah.cap.posts.IPostService;
 import edu.najah.cap.posts.Post;
 import edu.najah.cap.posts.PostService;
 
+import java.io.IOException;
 import java.time.Instant;
 
 public class Application {
@@ -24,16 +26,16 @@ public class Application {
     private static final IPostService postService = new PostService();
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         generateRandomData();
         Instant start = Instant.now();
         System.out.println("Application Started: " + start);
         //TODO Your application starts here. Do not Change the existing code
 
-
-
-
-
+        PdfConvertor pdfConvertor=new PdfConvertor();
+        pdfConvertor.ConvertTOPdf("DataPDF.pdf");
+        ICompress zipper= CompressFactory.getCompressType(CompressType.ZIP);
+        zipper.compress("CompressData.rar","DataPDF.pdf");
 
 
 
@@ -43,6 +45,8 @@ public class Application {
         Instant end = Instant.now();
         System.out.println("Application Ended: " + end);
     }
+
+
 
 
     private static void generateRandomData() {

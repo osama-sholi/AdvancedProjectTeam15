@@ -1,6 +1,9 @@
 package edu.najah.cap.compress;
-import java.io.*;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 public interface ICompress {
-    void compressPdf(String sourceFilePath, String destFilePath) throws IOException;
+     public void  compress(String path,String ...files)throws FileNotFoundException, IOException;
 
 }

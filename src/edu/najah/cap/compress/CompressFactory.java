@@ -1,11 +1,11 @@
 package edu.najah.cap.compress;
 
 public class CompressFactory {
-   public static CompressZIP getCompressType(CompressType type) {
-       CompressZIP compressZIP = null;
+   public static ICompress getCompressType(CompressType type) {
+       ICompress compressor = null;
        if (type.equals(CompressType.ZIP)) {
-           compressZIP = new CompressZIP();
+           compressor = new CompressZIP();
        }
-       return compressZIP;
+       return compressor;
    }
     }

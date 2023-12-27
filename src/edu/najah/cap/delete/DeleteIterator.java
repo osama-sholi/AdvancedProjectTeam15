@@ -7,8 +7,11 @@
         private final List<T> list;
         private int currentIndex = 0;
 
-        public DeleteIterator(List<T> list) {
-            this.list = list;
+        public DeleteIterator(List<T> list) throws IllegalArgumentException{
+            if (list == null) {
+                throw new IllegalArgumentException("List cannot be null");
+            }
+            this.list = list;;
         }
 
         @Override

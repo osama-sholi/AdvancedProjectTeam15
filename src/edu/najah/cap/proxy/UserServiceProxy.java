@@ -1,89 +1,70 @@
 package edu.najah.cap.proxy;
 
-import edu.najah.cap.exceptions.*;
 import edu.najah.cap.delete.DeletedUsersArchive;
+import edu.najah.cap.exceptions.*;
 import edu.najah.cap.iam.IUserService;
 import edu.najah.cap.iam.UserProfile;
 import edu.najah.cap.iam.UserService;
+import edu.najah.cap.logs.MyLogging;
 
-import java.util.logging.Logger;
+import java.util.logging.Level;
+
+
 public class UserServiceProxy implements IUserService {
+    private UserService userService;
 
-        private UserService userService;
-    private static final Logger LOGGER = Logger.getLogger(UserServiceProxy.class.getName());
-
-        public UserServiceProxy() {
-            if (userService == null) {
-                userService = new UserService();
-            }
+    public UserServiceProxy() {
+        if (userService == null) {
+            userService = new UserService();
         }
+    }
 
-        @Override
-        public void addUser(UserProfile user) {
+    @Override
+    public void addUser(UserProfile user) {
+        try {
+            validateUsername(user.getUserName());
+        } catch (UserDeletedException | BlankUsernameException | UserAlreadyExistsException | BadRequestException e) {
+            MyLogging.log(Level.SEVERE, e.getMessage());
+        } catch (NotFoundException e) {
+            userService.addUser(user);
+        }
+    }
+
+    @Override
+    public void updateUser(UserProfile user) throws NotFoundException, SystemBusyException, BadRequestException {
+        userService.updateUser(user);
+    }
+
+    @Override
+    public void deleteUser(String userName) throws NotFoundException, SystemBusyException, BadRequestException {
+        DeletedUsersArchive.addDeletedUser(userName);
+        userService.deleteUser(userName);
+    }
+
+    @Override
+    public UserProfile getUser(String userName) throws NotFoundException, SystemBusyException, BadRequestException {
+        return userService.getUser(userName);
+    }
+
+    private void validateUsername(String username) throws BlankUsernameException, UserDeletedException, UserAlreadyExistsException, NotFoundException, BadRequestException {
+        try {
+            if (username.trim().isBlank()) {
+                throw new BlankUsernameException("User name cannot be empty");
+            }
+            if (DeletedUsersArchive.isUserDeleted(username)) {
+                throw new UserDeletedException("Username unavailable as it is deleted");
+            }
+            while (true) {
+                userService.getUser(username);
+                throw new UserAlreadyExistsException("User already exists");
+            }
+        } catch (SystemBusyException e) {
+            MyLogging.log(Level.WARNING, "System Busy, Trying Again...");
             try {
-                if (user.getUserName().trim().isBlank()) {
-                    throw new BlankUsernameException("User name cannot be empty");
-                }
-                if (userService.getUser(user.getUserName()) != null) {
-                    throw new UserAlreadyExistsException("User already exists");
-                }
-                if (DeletedUsersArchive.isUserDeleted(user.getUserName())) {
-                    throw new UserDeletedException("User is deleted");
-                }
-                userService.addUser(user);
-            } catch (UserAlreadyExistsException | UserDeletedException | BlankUsernameException e) {
-                LOGGER.warning(e.getMessage());
-            } catch (NotFoundException | NullPointerException e) {
-                LOGGER.warning(e.getMessage());
-            } catch (Exception e) {
-                LOGGER.warning(e.getMessage());
+                Thread.sleep(1000);
+            } catch (InterruptedException interruptedException) {
+                interruptedException.printStackTrace();
             }
         }
-
-        @Override
-        public void updateUser(UserProfile user) {
-            try {
-                if (user.getUserName().trim().isBlank()) {
-                    throw new BlankUsernameException("User name cannot be empty");
-                }
-                if (userService.getUser(user.getUserName()) == null) {
-                    throw new UserAlreadyExistsException("User does not exist");
-                }
-                if (DeletedUsersArchive.isUserDeleted(user.getUserName())) {
-                    throw new UserDeletedException("User is deleted");
-                }
-                userService.updateUser(user);
-            } catch (UserAlreadyExistsException | UserDeletedException | BlankUsernameException e) {
-                LOGGER.warning(e.getMessage());
-            } catch (NotFoundException | NullPointerException e) {
-                LOGGER.warning(e.getMessage());
-            } catch (Exception e) {
-                LOGGER.warning(e.getMessage());
-            }
-        }
-
-        @Override
-        public void deleteUser(String userName) {
-            try {
-                DeletedUsersArchive.addDeletedUser(userName);
-                userService.deleteUser(userName);
-            } catch (NotFoundException | BadRequestException | SystemBusyException e) {
-                LOGGER.warning(e.getMessage());
-            } catch (Exception e) {
-                LOGGER.warning(e.getMessage());
-            }
-
-        }
-
-        @Override
-        public UserProfile getUser(String userName) {
-            try {
-                return userService.getUser(userName);
-            } catch (NotFoundException | BadRequestException | SystemBusyException e) {
-                LOGGER.warning(e.getMessage());
-            } catch (Exception e) {
-                LOGGER.warning(e.getMessage());
-            }
-            return null;
-        }
+    }
 }

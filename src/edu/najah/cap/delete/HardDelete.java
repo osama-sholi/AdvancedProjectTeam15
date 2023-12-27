@@ -1,39 +1,21 @@
 package edu.najah.cap.delete;
 
-import edu.najah.cap.activity.UserActivity;
-import edu.najah.cap.activity.UserActivityService;
-import edu.najah.cap.iam.IUserService;
-import edu.najah.cap.payment.PaymentService;
-import edu.najah.cap.payment.Transaction;
-import edu.najah.cap.posts.Post;
-import edu.najah.cap.posts.PostService;
-import edu.najah.cap.proxy.UserServiceProxy;
+import edu.najah.cap.exceptions.BadRequestException;
+import edu.najah.cap.logs.MyLogging;
 
-public class HardDelete extends AbstractDelete {
-    public void delete(String username){
-        System.out.println("Hard Delete for user: " + username);
-        try {
-            // Delete all posts of the username
-            PostService postService = new PostService();
-            DeleteIterator<Post> postsIterator = new DeleteIterator<>(postService.getPosts(username));
-            deleteData(postsIterator, "Posts");
+import java.util.logging.Level;
 
-            // Delete all transactions of the username
-            PaymentService paymentService = new PaymentService();
-            DeleteIterator<Transaction> transactionsIterator = new DeleteIterator<>(paymentService.getTransactions(username));
-            deleteData(transactionsIterator, "Transactions");
+import static edu.najah.cap.delete.DeleteService.deleteData;
+import static edu.najah.cap.delete.DeleteService.deleteUser;
 
-            // Delete all activities of the username
-            UserActivityService userActivityService = new UserActivityService();
-            DeleteIterator<UserActivity> userActivitiesIterator = new DeleteIterator<>(userActivityService.getUserActivity(username));
-            deleteData(userActivitiesIterator, "User Activities");
-
-            // Delete user
-            IUserService userService = new UserServiceProxy();
-            userService.deleteUser(username);
-            System.out.println("User Deleted");
-        } catch (Exception e) {
-            System.err.println("An error occurred: " + e.getMessage());
-        }
+public class HardDelete implements IDelete {
+    @Override
+    public void delete(String username) throws BadRequestException {
+        MyLogging.log(Level.INFO, "Hard Delete Started for " + username);
+        deleteData("Posts", username);
+        deleteData("Transactions", username);
+        deleteData("User Activities", username);
+        deleteUser(username);
+        MyLogging.log(Level.INFO, "Hard Delete Completed for " + username);
     }
 }

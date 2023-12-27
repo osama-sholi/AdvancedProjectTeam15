@@ -3,9 +3,7 @@ package edu.najah.cap.data;
 import edu.najah.cap.activity.IUserActivityService;
 import edu.najah.cap.activity.UserActivity;
 import edu.najah.cap.activity.UserActivityService;
-import edu.najah.cap.exceptions.BadRequestException;
-import edu.najah.cap.exceptions.NotFoundException;
-import edu.najah.cap.exceptions.SystemBusyException;
+import edu.najah.cap.exceptions.Util;
 import edu.najah.cap.iam.IUserService;
 import edu.najah.cap.iam.UserProfile;
 import edu.najah.cap.iam.UserService;
@@ -19,6 +17,7 @@ import edu.najah.cap.posts.PostService;
 
 import java.time.Instant;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
 
 public class Application {
 
@@ -33,16 +32,12 @@ public class Application {
         generateRandomData();
         Instant start = Instant.now();
         System.out.println("Application Started: " + start);
-
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter your username: ");
         System.out.println("Note: You can use any of the following usernames: user0, user1, user2, user3, .... user99");
         String userName = scanner.nextLine();
         setLoginUserName(userName);
         //TODO Your application starts here. Do not Change the existing code
-
-
-
 
 
 
@@ -55,6 +50,7 @@ public class Application {
 
 
     private static void generateRandomData() {
+        Util.setSkipValidation(true);
         for (int i = 0; i < 100; i++) {
             generateUser(i);
             generatePost(i);
@@ -62,10 +58,19 @@ public class Application {
             generateActivity(i);
         }
         System.out.println("Data Generation Completed");
+        Util.setSkipValidation(false);
     }
+
 
     private static void generateActivity(int i) {
         for (int j = 0; j < 100; j++) {
+            try {
+                if(UserType.NEW_USER.equals(userService.getUser("user" + i).getUserType())) {
+                    continue;
+                }
+            } catch (Exception e) {
+                System.err.println("Error while generating activity for user" + i);
+            }
             userActivityService.addUserActivity(new UserActivity("user" + i, "activity" + i + "." + j, Instant.now().toString()));
         }
     }

@@ -14,12 +14,12 @@ public class PdfConvertor{
             Document document = new Document();
             PdfWriter.getInstance(document, new FileOutputStream(fileName));
             document.open();
-            BufferedReader br = new BufferedReader(new FileReader("templeate.txt"));
+            BufferedReader bufferedReader = new BufferedReader(new FileReader("templeate.txt"));
             String line;
-            while ((line = br.readLine()) != null) {
+            while ((line = bufferedReader.readLine()) != null) {
                 document.add(new Paragraph(line));
             }
-            br.close();
+            bufferedReader.close();
             document.close();
             System.out.println("Finished Convert to PDF");
 

@@ -3,6 +3,12 @@ package edu.najah.cap.data;
 import edu.najah.cap.activity.IUserActivityService;
 import edu.najah.cap.activity.UserActivity;
 import edu.najah.cap.activity.UserActivityService;
+import edu.najah.cap.delete.DeleteFactory;
+import edu.najah.cap.delete.DeleteTypes;
+import edu.najah.cap.delete.IDelete;
+import edu.najah.cap.exceptions.BadRequestException;
+import edu.najah.cap.exceptions.NotFoundException;
+import edu.najah.cap.exceptions.SystemBusyException;
 import edu.najah.cap.exceptions.Util;
 import edu.najah.cap.iam.IUserService;
 import edu.najah.cap.iam.UserProfile;
@@ -14,10 +20,13 @@ import edu.najah.cap.payment.Transaction;
 import edu.najah.cap.posts.IPostService;
 import edu.najah.cap.posts.Post;
 import edu.najah.cap.posts.PostService;
+import edu.najah.cap.servicesfactories.UserServiceFactory;
 
 import java.time.Instant;
 import java.util.Scanner;
-import java.util.concurrent.ExecutorService;
+import java.util.logging.Level;
+
+import static edu.najah.cap.logs.MyLogging.log;
 
 public class Application {
 
@@ -38,14 +47,45 @@ public class Application {
         String userName = scanner.nextLine();
         setLoginUserName(userName);
         //TODO Your application starts here. Do not Change the existing code
+        try {
+            IUserService proxyUserService = UserServiceFactory.getUserService("UserServiceProxy");
+            while (true) {
+                try {
+                    proxyUserService.getUser(userName);
+                    break;
+                } catch (NotFoundException e) {
+                    log(Level.SEVERE, e.getMessage(), "Application", "main");
+                    return;
+                } catch (SystemBusyException e) {
+                    log(Level.WARNING, "System Busy, Trying Again...", "Application", "main");
+                } catch (BadRequestException e) {
+                    log(Level.SEVERE, e.getMessage(), "Application", "main");
+                    return;
+                }
+            }
+            // here export the user data to a file
 
+            IDelete softDelete = DeleteFactory.getDelete(DeleteTypes.SOFT_DELETE);
+            softDelete.delete(userName);
 
+            // here export the user data to a file
 
+            IDelete hardDelete = DeleteFactory.getDelete(DeleteTypes.HARD_DELETE);
+            hardDelete.delete(userName);
 
+            // here export the user data to a file
 
+            UserProfile user = new UserProfile();
+            user.setUserName(userName);
+            proxyUserService.addUser(user); // This should throw an exception
+
+        } catch (Exception e) {
+            log(Level.SEVERE, e.getMessage(), "Application", "main");
+        }
         //TODO Your application ends here. Do not Change the existing code
         Instant end = Instant.now();
         System.out.println("Application Ended: " + end);
+        System.out.println("Total Time: " + (end.toEpochMilli() - start.toEpochMilli()) + " Milliseconds");
     }
 
 

@@ -5,11 +5,11 @@ import edu.najah.cap.iam.UserService;
 import edu.najah.cap.proxy.UserServiceProxy;
 
 public class UserServiceFactory {
-    public static IUserService getUserService(String userService) throws IllegalArgumentException{
-        if ("UserService".equals(userService)) {
+    public static IUserService getUserService(UserServiceTypes type) throws IllegalArgumentException{
+        if (UserServiceTypes.USER_SERVICE.equals(type)) {
             return new UserService();
         }
-        if ("UserServiceProxy".equals(userService)) {
+        if (UserServiceTypes.USER_SERVICE_PROXY.equals(type)) {
             return new UserServiceProxy();
         }
         else {

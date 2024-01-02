@@ -4,8 +4,8 @@ import edu.najah.cap.posts.IPostService;
 import edu.najah.cap.posts.PostService;
 
 public class PostServiceFactory {
-    public static IPostService getPostService(String postService) throws IllegalArgumentException{
-        if ("PostService".equals(postService)) {
+    public static IPostService getPostService(PostServiceTypes type) throws IllegalArgumentException{
+        if (PostServiceTypes.POST_SERVICE.equals(type)) {
             return new PostService();
         }
         else {

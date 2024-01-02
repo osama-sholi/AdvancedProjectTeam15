@@ -3,9 +3,7 @@ package edu.najah.cap.data;
 import edu.najah.cap.activity.IUserActivityService;
 import edu.najah.cap.activity.UserActivity;
 import edu.najah.cap.activity.UserActivityService;
-import edu.najah.cap.export.ExportActivity;
-import edu.najah.cap.export.ExportProfile;
-import edu.najah.cap.export.ExportTransaction;
+import edu.najah.cap.export.*;
 import edu.najah.cap.delete.DeleteFactory;
 import edu.najah.cap.delete.DeleteTypes;
 import edu.najah.cap.delete.IDelete;
@@ -23,8 +21,8 @@ import edu.najah.cap.payment.Transaction;
 import edu.najah.cap.posts.IPostService;
 import edu.najah.cap.posts.Post;
 import edu.najah.cap.posts.PostService;
-import edu.najah.cap.export.ExportPosts;
 import edu.najah.cap.servicesfactories.UserServiceFactory;
+import edu.najah.cap.servicesfactories.UserServiceTypes;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -52,8 +50,9 @@ public class Application {
         String userName = scanner.nextLine();
         setLoginUserName(userName);
         //TODO Your application starts here. Do not Change the existing code
+        String path = "src/edu/najah/cap/output/";
         try {
-            IUserService proxyUserService = UserServiceFactory.getUserService("UserServiceProxy");
+            IUserService proxyUserService = UserServiceFactory.getUserService(UserServiceTypes.USER_SERVICE_PROXY);
             while (true) {
                 try {
                     proxyUserService.getUser(userName);
@@ -68,7 +67,9 @@ public class Application {
                     return;
                 }
             }
-            // here export the user data to a file
+
+            IExport export = ExportFactory.getExportType(ExportType.LOCALLY);
+            export.exportData(userName, path);
 
             IDelete softDelete = DeleteFactory.getDelete(DeleteTypes.SOFT_DELETE);
             softDelete.delete(userName);

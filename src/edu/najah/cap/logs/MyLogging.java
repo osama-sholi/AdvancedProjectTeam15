@@ -8,15 +8,15 @@ import java.util.logging.SimpleFormatter;
 
 public class MyLogging {
     private static Logger logger;
-    private static FileHandler fh;
+    private static FileHandler fileHandler;
 
     static {
         try {
             logger = Logger.getLogger(MyLogging.class.getName());
-            fh = new FileHandler("./src/edu/najah/cap/logs/Logs.log");
-            logger.addHandler(fh);
+            fileHandler = new FileHandler("./out/production/AdvancedProjectTeam15/edu/najah/cap/logs/logs.log");
+            logger.addHandler(fileHandler);
             SimpleFormatter formatter = new SimpleFormatter();
-            fh.setFormatter(formatter);
+            fileHandler.setFormatter(formatter);
         } catch (SecurityException | IOException e) {
             e.printStackTrace();
         }

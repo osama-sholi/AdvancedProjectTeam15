@@ -3,7 +3,13 @@ package edu.najah.cap.data;
 import edu.najah.cap.activity.IUserActivityService;
 import edu.najah.cap.activity.UserActivity;
 import edu.najah.cap.activity.UserActivityService;
-import edu.najah.cap.compress.*;
+import edu.najah.cap.delete.DeleteFactory;
+import edu.najah.cap.delete.DeleteTypes;
+import edu.najah.cap.delete.IDelete;
+import edu.najah.cap.exceptions.BadRequestException;
+import edu.najah.cap.exceptions.NotFoundException;
+import edu.najah.cap.exceptions.SystemBusyException;
+import edu.najah.cap.exceptions.Util;
 import edu.najah.cap.iam.IUserService;
 import edu.najah.cap.iam.UserProfile;
 import edu.najah.cap.iam.UserService;
@@ -14,9 +20,14 @@ import edu.najah.cap.payment.Transaction;
 import edu.najah.cap.posts.IPostService;
 import edu.najah.cap.posts.Post;
 import edu.najah.cap.posts.PostService;
+import edu.najah.cap.servicesfactories.UserServiceFactory;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.Scanner;
+import java.util.logging.Level;
+
+import static edu.najah.cap.logs.MyLogging.log;
 
 public class Application {
 
@@ -25,31 +36,64 @@ public class Application {
     private static final IUserService userService = new UserService();
     private static final IPostService postService = new PostService();
 
+    private static String loginUserName;
 
     public static void main(String[] args) throws IOException {
         generateRandomData();
         Instant start = Instant.now();
         System.out.println("Application Started: " + start);
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter your username: ");
+        System.out.println("Note: You can use any of the following usernames: user0, user1, user2, user3, .... user99");
+        String userName = scanner.nextLine();
+        setLoginUserName(userName);
         //TODO Your application starts here. Do not Change the existing code
+        try {
+            IUserService proxyUserService = UserServiceFactory.getUserService("UserServiceProxy");
+            while (true) {
+                try {
+                    proxyUserService.getUser(userName);
+                    break;
+                } catch (NotFoundException e) {
+                    log(Level.SEVERE, e.getMessage(), "Application", "main");
+                    return;
+                } catch (SystemBusyException e) {
+                    log(Level.WARNING, "System Busy, Trying Again...", "Application", "main");
+                } catch (BadRequestException e) {
+                    log(Level.SEVERE, e.getMessage(), "Application", "main");
+                    return;
+                }
+            }
+            // here export the user data to a file
 
-        PdfConvertor pdfConvertor=new PdfConvertor();
-        pdfConvertor.ConvertTOPdf("DataPDF.pdf");
-        ICompress zipper= CompressFactory.getCompressType(CompressType.ZIP);
-        zipper.compress("CompressData.rar","DataPDF.pdf");
+            IDelete softDelete = DeleteFactory.getDelete(DeleteTypes.SOFT_DELETE);
+            softDelete.delete(userName);
 
+            // here export the user data to a file
 
+            IDelete hardDelete = DeleteFactory.getDelete(DeleteTypes.HARD_DELETE);
+            hardDelete.delete(userName);
 
+            // here export the user data to a file
 
+            UserProfile user = new UserProfile();
+            user.setUserName(userName);
+            proxyUserService.addUser(user); // This should throw an exception
 
+        } catch (Exception e) {
+            log(Level.SEVERE, e.getMessage(), "Application", "main");
+        }
         //TODO Your application ends here. Do not Change the existing code
         Instant end = Instant.now();
         System.out.println("Application Ended: " + end);
+        System.out.println("Total Time: " + (end.toEpochMilli() - start.toEpochMilli()) + " Milliseconds");
     }
 
 
 
 
     private static void generateRandomData() {
+        Util.setSkipValidation(true);
         for (int i = 0; i < 100; i++) {
             generateUser(i);
             generatePost(i);
@@ -57,17 +101,32 @@ public class Application {
             generateActivity(i);
         }
         System.out.println("Data Generation Completed");
+        Util.setSkipValidation(false);
     }
+
 
     private static void generateActivity(int i) {
         for (int j = 0; j < 100; j++) {
+            try {
+                if(UserType.NEW_USER.equals(userService.getUser("user" + i).getUserType())) {
+                    continue;
+                }
+            } catch (Exception e) {
+                System.err.println("Error while generating activity for user" + i);
+            }
             userActivityService.addUserActivity(new UserActivity("user" + i, "activity" + i + "." + j, Instant.now().toString()));
         }
     }
 
     private static void generatePayment(int i) {
         for (int j = 0; j < 100; j++) {
-            paymentService.pay(new Transaction("user" + i, i * j, "description" + i + "." + j));
+            try {
+                if (userService.getUser("user" + i).getUserType() == UserType.PREMIUM_USER) {
+                    paymentService.pay(new Transaction("user" + i, i * j, "description" + i + "." + j));
+                }
+            } catch (Exception e) {
+                System.err.println("Error while generating post for user" + i);
+            }
         }
     }
 
@@ -105,5 +164,13 @@ public class Application {
         } else {
             return UserType.PREMIUM_USER;
         }
+    }
+
+    public static String getLoginUserName() {
+        return loginUserName;
+    }
+
+    private static void setLoginUserName(String loginUserName) {
+        Application.loginUserName = loginUserName;
     }
 }

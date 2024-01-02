@@ -13,7 +13,7 @@ import static edu.najah.cap.logs.MyLogging.log;
 
 public class ExportDownload implements IExport{
     public void exportData(String username, String path) {
-        System.out.println("Exporting data to local storage...");
+        System.out.println("Exporting" + username + " data to local storage...");
         try {
             List<String> files = new ArrayList<>();
 
@@ -23,11 +23,10 @@ public class ExportDownload implements IExport{
             files.add(ExportServiceFactory.getExportService(ExportServiceType.TRANSACTION).exportData(username, path));
 
             CompressFactory.getCompressType(CompressType.ZIP).compress(path, files);
-        }catch (FileNotFoundException e){
+        } catch (FileNotFoundException e) {
             log(Level.SEVERE, e.getMessage(), "ExportDownload", "exportData");
-        }catch (Exception e){
+        } catch (Exception e) {
             log(Level.SEVERE, e.getMessage(), "ExportDownload", "exportData");
         }
-
     }
 }

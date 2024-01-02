@@ -22,6 +22,7 @@ import edu.najah.cap.posts.Post;
 import edu.najah.cap.posts.PostService;
 import edu.najah.cap.servicesfactories.UserServiceFactory;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -37,7 +38,7 @@ public class Application {
 
     private static String loginUserName;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         generateRandomData();
         Instant start = Instant.now();
         System.out.println("Application Started: " + start);
@@ -87,6 +88,8 @@ public class Application {
         System.out.println("Application Ended: " + end);
         System.out.println("Total Time: " + (end.toEpochMilli() - start.toEpochMilli()) + " Milliseconds");
     }
+
+
 
 
     private static void generateRandomData() {

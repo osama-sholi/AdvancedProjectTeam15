@@ -9,7 +9,4 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="itextpdf.maven.itextdoc" level="project" />
   </component>
-  <component name="SonarLintModuleSettings">
-    <option name="uniqueId" value="6158963f-4b4e-44fd-b5e1-7b5565ecd440" />
-  </component>
 </module>

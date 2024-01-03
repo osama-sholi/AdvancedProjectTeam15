@@ -3,7 +3,6 @@ package edu.najah.cap.data;
 import edu.najah.cap.activity.IUserActivityService;
 import edu.najah.cap.activity.UserActivity;
 import edu.najah.cap.activity.UserActivityService;
-import edu.najah.cap.export.*;
 import edu.najah.cap.delete.DeleteFactory;
 import edu.najah.cap.delete.DeleteTypes;
 import edu.najah.cap.delete.IDelete;
@@ -11,6 +10,9 @@ import edu.najah.cap.exceptions.BadRequestException;
 import edu.najah.cap.exceptions.NotFoundException;
 import edu.najah.cap.exceptions.SystemBusyException;
 import edu.najah.cap.exceptions.Util;
+import edu.najah.cap.export.ExportFactory;
+import edu.najah.cap.export.ExportType;
+import edu.najah.cap.export.IExport;
 import edu.najah.cap.iam.IUserService;
 import edu.najah.cap.iam.UserProfile;
 import edu.najah.cap.iam.UserService;
@@ -50,9 +52,13 @@ public class Application {
         String userName = scanner.nextLine();
         setLoginUserName(userName);
         //TODO Your application starts here. Do not Change the existing code
+
+        // This is the path where the exported data will be stored
         String path = "src/edu/najah/cap/output/";
         try {
             IUserService proxyUserService = UserServiceFactory.getUserService(UserServiceTypes.USER_SERVICE_PROXY);
+
+            // Check if username is available before going further
             while (true) {
                 try {
                     proxyUserService.getUser(userName);
@@ -68,18 +74,22 @@ public class Application {
                 }
             }
 
+            // Export UserData Locally
+
             IExport export = ExportFactory.getExportType(ExportType.LOCALLY);
             export.exportData(userName, path);
+
+            // Soft Delete
 
             IDelete softDelete = DeleteFactory.getDelete(DeleteTypes.SOFT_DELETE);
             softDelete.delete(userName);
 
-            // here export the user data to a file
+            // Hard Delete
 
             IDelete hardDelete = DeleteFactory.getDelete(DeleteTypes.HARD_DELETE);
             hardDelete.delete(userName);
 
-            // here export the user data to a file
+            // Test if username is unavailable after hard delete
 
             UserProfile user = new UserProfile();
             user.setUserName(userName);

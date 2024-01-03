@@ -1,6 +1,7 @@
 package edu.najah.cap.export;
 
-import edu.najah.cap.compress.*;
+import edu.najah.cap.compress.CompressFactory;
+import edu.najah.cap.compress.CompressType;
 import edu.najah.cap.export.exportservices.ExportServiceFactory;
 import edu.najah.cap.export.exportservices.ExportServiceType;
 
@@ -13,7 +14,7 @@ import static edu.najah.cap.logs.MyLogging.log;
 
 public class ExportDownload implements IExport{
     public void exportData(String username, String path) {
-        System.out.println("Exporting" + username + " data to local storage...");
+        log(Level.INFO, "Exporting " + username + " data to " + path, "ExportDownload", "exportData");
         try {
             List<String> files = new ArrayList<>();
 

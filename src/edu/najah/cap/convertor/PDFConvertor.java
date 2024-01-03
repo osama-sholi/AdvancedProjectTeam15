@@ -1,11 +1,10 @@
-package edu.najah.cap.compress;
+package edu.najah.cap.convertor;
 
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
 import edu.najah.cap.exceptions.FileDeletionException;
-import edu.najah.cap.logs.MyLogging;
 
 import java.io.*;
 import java.util.logging.Level;
@@ -13,7 +12,7 @@ import java.util.logging.Level;
 import static edu.najah.cap.logs.MyLogging.log;
 
 public class PDFConvertor {
-    public static String ConvertTOPdf(String path) throws IOException {
+    public static String ConvertToPdf(String path) throws IOException {
         log(Level.INFO, "Converting to PDF", "PDFConvertor", "ConvertTOPdf");
         String textFile = path;
         String pdfFile = path.substring(0, path.length() - 4) + ".pdf";

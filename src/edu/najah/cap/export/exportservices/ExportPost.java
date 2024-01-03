@@ -1,6 +1,6 @@
 package edu.najah.cap.export.exportservices;
 
-import edu.najah.cap.compress.PDFConvertor;
+import edu.najah.cap.convertor.PDFConvertor;
 import edu.najah.cap.posts.IPostService;
 import edu.najah.cap.posts.Post;
 import edu.najah.cap.servicesfactories.PostServiceFactory;
@@ -13,7 +13,7 @@ import java.util.logging.Level;
 
 import static edu.najah.cap.logs.MyLogging.log;
 
-public class ExportPosts implements IExportService {
+public class ExportPost implements IExportService {
     @Override
     public String exportData(String user, String path) throws Exception {
         log(Level.INFO, "Exporting posts to local storage...", "ExportPosts", "exportPosts");
@@ -37,7 +37,7 @@ public class ExportPosts implements IExportService {
                 postWriter.println();
             }
             postWriter.close();
-            return PDFConvertor.ConvertTOPdf(outputPath);
+            return PDFConvertor.ConvertToPdf(outputPath);
         }
     }
 }

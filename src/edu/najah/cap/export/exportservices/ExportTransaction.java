@@ -1,6 +1,6 @@
 package edu.najah.cap.export.exportservices;
 
-import edu.najah.cap.compress.PDFConvertor;
+import edu.najah.cap.convertor.PDFConvertor;
 import edu.najah.cap.exceptions.FileDeletionException;
 import edu.najah.cap.exceptions.NotFoundException;
 import edu.najah.cap.exceptions.SystemBusyException;
@@ -58,7 +58,7 @@ public class ExportTransaction implements IExportService {
                 transactionWriter.println();
             }
             transactionWriter.close();
-            return PDFConvertor.ConvertTOPdf(outputPath);
+            return PDFConvertor.ConvertToPdf(outputPath);
         } catch (UnqualifiedUserException e) {
             log(Level.WARNING, e.getMessage(), "ExportTransaction", "exportTransaction");
             try {

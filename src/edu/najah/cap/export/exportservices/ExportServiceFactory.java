@@ -1,11 +1,9 @@
 package edu.najah.cap.export.exportservices;
 
-import edu.najah.cap.export.exportservices.ExportServiceType;
-
 public class ExportServiceFactory {
     public static IExportService getExportService(ExportServiceType type) {
         if (type.equals(ExportServiceType.POST)) {
-            return new ExportPosts();
+            return new ExportPost();
         } else if (type.equals(ExportServiceType.ACTIVITY)) {
             return new ExportActivity();
         } else if (type.equals(ExportServiceType.PROFILE)) {

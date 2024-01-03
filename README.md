@@ -67,3 +67,6 @@ We mainly used the following design patterns:
 * Proxy design pattern: to enhance the user profile service by handling some cases that the user profile service didn't handle without modifying the user profile service itself.
 * Iterator design pattern: to iterate over some services' data to preform clean delete to avoid any errors.
 * Singleton design pattern: we combine the singleton design pattern with the proxy design pattern to enhance the performance of the system by creating only one instance of the user profile service in the proxy user profile service.
+
+## Class Diagram
+<img src="./AdvancedProjectClassDiagram.png" width="100%"/>

@@ -1,6 +1,6 @@
 package edu.najah.cap.export.exportservices;
 
-import edu.najah.cap.compress.PDFConvertor;
+import edu.najah.cap.convertor.PDFConvertor;
 import edu.najah.cap.iam.IUserService;
 import edu.najah.cap.iam.UserProfile;
 import edu.najah.cap.servicesfactories.UserServiceFactory;
@@ -43,7 +43,7 @@ public class ExportProfile implements IExportService {
             profileWriter.println("Postal Code: " + userProfile.getPostalCode());
             profileWriter.println("Building: " + userProfile.getBuilding());
             profileWriter.close();
-            return PDFConvertor.ConvertTOPdf(outputPath);
+            return PDFConvertor.ConvertToPdf(outputPath);
         }
     }
 }

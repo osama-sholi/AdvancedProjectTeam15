@@ -2,13 +2,12 @@ package edu.najah.cap.export.exportservices;
 
 import edu.najah.cap.activity.IUserActivityService;
 import edu.najah.cap.activity.UserActivity;
-import edu.najah.cap.compress.PDFConvertor;
+import edu.najah.cap.convertor.PDFConvertor;
 import edu.najah.cap.exceptions.FileDeletionException;
 import edu.najah.cap.exceptions.NotFoundException;
 import edu.najah.cap.exceptions.SystemBusyException;
 import edu.najah.cap.exceptions.UnqualifiedUserException;
 import edu.najah.cap.iam.IUserService;
-import edu.najah.cap.iam.UserProfile;
 import edu.najah.cap.iam.UserType;
 import edu.najah.cap.servicesfactories.ActivityServiceFactory;
 import edu.najah.cap.servicesfactories.ActivityServiceTypes;
@@ -57,7 +56,7 @@ public class ExportActivity implements IExportService {
                 activityWriter.println();
             }
             activityWriter.close();
-            return PDFConvertor.ConvertTOPdf(outputPath);
+            return PDFConvertor.ConvertToPdf(outputPath);
         } catch (UnqualifiedUserException e) {
             log(Level.WARNING, e.getMessage(), "ExportActivity", "exportActivity");
             try {
